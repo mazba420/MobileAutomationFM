@@ -2,7 +2,6 @@ package com.td.pages;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import reporting.ExtentTestManager;
 
 public class HomePage {
 
@@ -16,10 +15,16 @@ public class HomePage {
        accounts.click();
    }
 
+   public boolean accountsDisplay(){
+      return accounts.isDisplayed();
+   }
+
     public void clickOnTransferBtn(){
         transferBtn.click();
     }
 
-
+    public boolean transferButtonDisplay(){
+        return transferBtn.isDisplayed();
+    }
 
 }
