@@ -1,4 +1,5 @@
 package common;
+
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.LogStatus;
 import io.appium.java_client.AppiumDriver;
@@ -9,6 +10,7 @@ import io.appium.java_client.remote.MobilePlatform;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
+import org.openqa.selenium.interactions.touch.TouchActions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -31,12 +33,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 public class TestBase {
     private static final Logger LOGGER = Logger.getLogger(TestBase.class);
     public static AppiumDriver driver;
-    private static ExtentReports extent;
     public static AppiumDriver appiumDriver = null;
     public static String platform = null;
+    private static ExtentReports extent;
 
     /**
      * @param platform        : platform of the mobile device
@@ -44,28 +47,6 @@ public class TestBase {
      * @param platformVersion
      * @throws MalformedURLException
      */
-    /**
-     * @param platform        : platform of the mobile device
-     * @param deviceName      : udid if the device
-     * @param platformVersion
-     * @throws MalformedURLException
-     */
-    @Parameters({"platform","deviceName","platformVersion"})
-    @BeforeMethod
-    public void getAppiumDriver(String platform,String deviceName,String platformVersion) throws MalformedURLException {
-        DesiredCapabilities cap = new DesiredCapabilities();
-        if (platform.equalsIgnoreCase("android")) {
-            cap.setCapability(MobileCapabilityType.DEVICE_NAME, deviceName);
-            cap.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
-            cap.setCapability(MobileCapabilityType.PLATFORM_VERSION, platformVersion);
-            cap.setCapability(MobileCapabilityType.APP_PACKAGE, "com.tdbank");
-            cap.setCapability(MobileCapabilityType.APP_ACTIVITY, "com.td.dcts.android.us.app.SplashScreenActivity");
-            driver = new AndroidDriver(new URL("http://localhost:4723/wd/hub"), cap);
-        }else {
-            //ios device code
-        }
-        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-    }
 
     //screenshot
     private static void captureScreenshot(WebDriver driver, String screenshotName) {
@@ -123,6 +104,46 @@ public class TestBase {
             ((AppiumDriver<WebElement>) (driver)).swipe(startx - offset, starty, endx, endy, swipeTime);
         }
 
+    }
+
+    public static void swipeFromOneToAnother(MobileElement element1, MobileElement element2) {
+        try {
+            TouchActions actions = new TouchActions(appiumDriver);
+            appiumDriver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
+            Point location1 = element1.getLocation();
+            int X1 = location1.getX();
+            int Y1 = location1.getY();
+            Point location2 = element2.getLocation();
+            int X2 = location2.getX();
+            int Y2 = location2.getY();
+
+            actions.scroll(X1, Y1).move(X2, Y2).release().perform();
+        } catch (Exception e) {
+
+        }
+    }
+
+    /**
+     * @param platform        : platform of the mobile device
+     * @param deviceName      : udid if the device
+     * @param platformVersion
+     * @throws MalformedURLException
+     */
+    @Parameters({"platform", "deviceName", "platformVersion"})
+    @BeforeMethod
+    public void getAppiumDriver(String platform, String deviceName, String platformVersion) throws MalformedURLException {
+        DesiredCapabilities cap = new DesiredCapabilities();
+        if (platform.equalsIgnoreCase("android")) {
+            cap.setCapability(MobileCapabilityType.DEVICE_NAME, deviceName);
+            cap.setCapability(MobileCapabilityType.PLATFORM_NAME, MobilePlatform.ANDROID);
+            cap.setCapability(MobileCapabilityType.PLATFORM_VERSION, platformVersion);
+            cap.setCapability(MobileCapabilityType.APP_PACKAGE, "com.tdbank");
+            cap.setCapability(MobileCapabilityType.APP_ACTIVITY, "com.td.dcts.android.us.app.SplashScreenActivity");
+            driver = new AndroidDriver(new URL("http://localhost:4723/wd/hub"), cap);
+        } else {
+            //ios device code
+        }
+        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
 
     //reporting starts
@@ -190,7 +211,6 @@ public class TestBase {
     }
 
 
-
     public void clickByXpath(String locator) {
         appiumDriver.findElement(By.xpath(locator)).click();
     }
@@ -239,12 +259,6 @@ public class TestBase {
     public void scrollAndClickByName(String locator) {
         appiumDriver.scrollTo(locator).click();
     }
-
-
-
-
-
-
 
 
 }
