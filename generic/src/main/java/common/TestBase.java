@@ -2,6 +2,7 @@ package common;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.LogStatus;
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.remote.MobilePlatform;
@@ -9,6 +10,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
@@ -23,13 +26,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 public class TestBase {
     private static final Logger LOGGER = Logger.getLogger(TestBase.class);
     public static AppiumDriver driver;
     private static ExtentReports extent;
+    public static AppiumDriver appiumDriver = null;
+    public static String platform = null;
 
     /**
      * @param platform        : platform of the mobile device
@@ -59,6 +66,7 @@ public class TestBase {
         }
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
     }
+
     //screenshot
     private static void captureScreenshot(WebDriver driver, String screenshotName) {
         DateFormat dateFormat = new SimpleDateFormat("HH_mm_ss");
@@ -183,6 +191,54 @@ public class TestBase {
 
 
 
+    public void clickByXpath(String locator) {
+        appiumDriver.findElement(By.xpath(locator)).click();
+    }
+
+    public void clickByXpath(MobileElement locator) {
+        locator.click();
+    }
+
+    public void clickByXpathWebElement(WebElement locator) {
+        locator.click();
+    }
+
+    public void sleep(int sec) throws InterruptedException {
+        Thread.sleep(1000 * sec);
+    }
+
+    public void typeByXpath(String locator, String value) {
+        appiumDriver.findElement(By.xpath(locator)).sendKeys(value);
+    }
+
+    public List<String> getTexts(List<WebElement> elements) {
+        List<String> text = new ArrayList<String>();
+
+        for (WebElement element : elements) {
+            text.add(element.getText());
+        }
+
+        return text;
+    }
+
+    public void scrollToElement(AppiumDriver driver, String element) {
+        MobileElement we = (MobileElement) driver.findElementByXPath(element);
+        driver.scrollTo(we.getText());
+    }
+
+    public void alertAccept(WebDriver driver) {
+        WebDriverWait wait = new WebDriverWait(driver, 5);
+        try {
+            wait.until(ExpectedConditions.alertIsPresent());
+            driver.switchTo().alert().accept();
+        } catch (Exception e) {
+            System.err.println("No alert visible in 5 seconds");
+        }
+    }
+
+    public void scrollAndClickByName(String locator) {
+        appiumDriver.scrollTo(locator).click();
+    }
 
 
 
